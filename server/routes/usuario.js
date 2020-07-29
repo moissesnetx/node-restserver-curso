@@ -1,11 +1,19 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt'); // encriptamos la contraseña
 const _ = require('underscore');
 const Usuario = require('../models/usuario')
+const { verificaToken, verificaRole } = require('../middlewares/autenticacion')
 
 const app = express();
 
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificaToken, (req, res) => {
+
+    // ACA demuestra que yo puedo tener la informacion del usuario que esta utilizando el token o realizando la solicitud
+    // return res.json({
+    //     usuario: req.usuario,
+    //     nombre: req.usuario.nombre,
+    //     email: req.usuario.email
+    // });
 
 
     let desde = req.query.desde || 0;
@@ -36,7 +44,7 @@ app.get('/usuario', function(req, res) {
         });
 });
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificaToken, verificaRole], (req, res) => {
 
     let body = req.body;
 
@@ -68,7 +76,7 @@ app.post('/usuario', function(req, res) {
 
 });
 
-app.put('/usuario/:idusua', function(req, res) {
+app.put('/usuario/:idusua', [verificaToken, verificaRole], (req, res) => {
 
     let id = req.params.idusua;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
@@ -92,7 +100,7 @@ app.put('/usuario/:idusua', function(req, res) {
 
 });
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaRole], (req, res) => {
 
     let id = req.params.id;
 
